@@ -12,14 +12,18 @@ router.post("/register", async (req, res) => {
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ msg: "Email already exists" });
 
-    const hashed = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashed });
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({ name, email, password: hashedPassword });
     await user.save();
 
     res.status(201).json({ msg: "User registered successfully" });
+
   } catch (err) {
+    console.error("❌ Register Error:", err); // Add this for full error output
     res.status(500).json({ msg: "Server error" });
   }
 });
+
 
 module.exports = router;
