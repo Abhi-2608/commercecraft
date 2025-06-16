@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 
+
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -11,11 +12,26 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    req.user = decoded; // { userId, role }
     next();
   } catch (err) {
     return res.status(403).json({ msg: "Invalid or expired token." });
   }
 };
 
-module.exports = verifyToken; 
+
+const isAdmin = (req, res, next) => {
+  if (req.user && req.user.role === "admin") {
+    next();
+  } else {
+    return res.status(403).json({ msg: "Access denied. Admins only." });
+  }
+};
+
+
+module.exports = {
+  verifyToken,
+  isAdmin,
+};
+console.log("middleware loaded, exporting verifyToken");
+
