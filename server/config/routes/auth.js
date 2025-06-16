@@ -1,14 +1,13 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const User = require("../../Model/user"); // Trigger redeploy
+const User = require("../../Model/user");
+const { verifyToken } = require("../../middleware/auth"); // ✅ Fix import
 
-console.log("✅ USER VALUE IS:", User);
-
-
-
+console.log(" USER VALUE IS:", User);
 
 const router = express.Router();
+
 
 router.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
@@ -18,25 +17,21 @@ router.post("/register", async (req, res) => {
     if (existing) return res.status(400).json({ msg: "Email already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const user = new User({ name, email, password: hashedPassword });
     await user.save();
 
     res.status(201).json({ msg: "User registered successfully" });
-
   } catch (err) {
-    console.error("❌ Register Error:", err); // Add this for full error output
+    console.error(" Register Error:", err);
     res.status(500).json({ msg: "Server error" });
   }
 });
-
 
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
       return res.status(401).json({ msg: "No account found with this email" });
@@ -54,7 +49,6 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "24h" });
 
-    
     res.status(200).json({
       msg: "Login successful",
       token,
@@ -64,19 +58,12 @@ router.post("/login", async (req, res) => {
         role: existingUser.role,
       },
     });
-
   } catch (err) {
     console.error("Login Error:", err.message);
     res.status(500).json({ msg: "Server error during login" });
   }
 });
 
-
-
-module.exports = router;
-
-
-const verifyToken = require("../../middleware/auth");
 
 router.get("/profile", verifyToken, (req, res) => {
   res.json({
@@ -85,3 +72,4 @@ router.get("/profile", verifyToken, (req, res) => {
   });
 });
 
+module.exports = router; 
