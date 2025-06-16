@@ -64,7 +64,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
+console.log("🧪 verifyToken is a", typeof verifyToken); 
 router.get("/profile", verifyToken, (req, res) => {
   res.json({
     msg: "Welcome to your profile!",
