@@ -35,3 +35,27 @@ router.get("/:id", async (req, res) => {
 });
 
 module.exports = router;
+
+
+
+router.put("/:id", verifyToken, async (req, res) => {
+    try {
+      const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+      if (!updated) return res.status(404).json({ msg: "Product not found" });
+      res.json({ msg: "Product updated", product: updated });
+    } catch (err) {
+      res.status(500).json({ msg: "Error updating product", error: err.message });
+    }
+  });
+  
+  
+  router.delete("/:id", verifyToken, async (req, res) => {
+    try {
+      const deleted = await Product.findByIdAndDelete(req.params.id);
+      if (!deleted) return res.status(404).json({ msg: "Product not found" });
+      res.json({ msg: "Product deleted" });
+    } catch (err) {
+      res.status(500).json({ msg: "Error deleting product", error: err.message });
+    }
+  });
+  
