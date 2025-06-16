@@ -16,13 +16,35 @@ router.post("/", verifyToken, isAdmin, async (req, res) => {
 
 
 router.get("/", async (req, res) => {
-  try {
-    const products = await Product.find().sort({ createdAt: -1 });
-    res.json(products);
-  } catch (err) {
-    res.status(500).json({ msg: "Error fetching products" });
-  }
-});
+    try {
+      const { category, priceMin, priceMax, search } = req.query;
+  
+      const filter = {};
+  
+      
+      if (category) {
+        filter.category = category;
+      }
+  
+    
+      if (priceMin || priceMax) {
+        filter.price = {};
+        if (priceMin) filter.price.$gte = Number(priceMin);
+        if (priceMax) filter.price.$lte = Number(priceMax);
+      }
+  
+     
+      if (search) {
+        filter.name = { $regex: search, $options: "i" };
+      }
+  
+      const products = await Product.find(filter).sort({ createdAt: -1 });
+      res.json(products);
+    } catch (err) {
+      res.status(500).json({ msg: "Error filtering products", error: err.message });
+    }
+  });
+  
 
 
 router.get("/:id", async (req, res) => {
