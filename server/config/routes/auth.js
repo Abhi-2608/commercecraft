@@ -74,3 +74,14 @@ router.post("/login", async (req, res) => {
 
 
 module.exports = router;
+
+
+const verifyToken = require("../../middleware/auth");
+
+router.get("/profile", verifyToken, (req, res) => {
+  res.json({
+    msg: "Welcome to your profile!",
+    user: req.user,
+  });
+});
+
