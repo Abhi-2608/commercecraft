@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../../Model/user");
 const { verifyToken } = require("../../middleware/auth"); // ✅ Fix import
 
-console.log(" USER VALUE IS:", User);
+console.log(" USER VALUE IS:", User);// force redeploy
 
 const router = express.Router();
 
